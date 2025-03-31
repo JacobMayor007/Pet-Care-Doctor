@@ -22,7 +22,7 @@ export default function RegisterAs() {
       key: 0,
       label: "Pet Veterinarian",
       icon: faHandHoldingMedical,
-      route: "/Sign-Up/Doctor",
+      route: "/Sign-Up-Doctor",
     },
     {
       key: 1,
