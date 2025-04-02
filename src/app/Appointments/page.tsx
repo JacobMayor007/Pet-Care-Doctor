@@ -106,6 +106,21 @@ export default function Appointments() {
     );
   }, [myAppointments]);
 
+  if (
+    todayAppointments.length < 1 &&
+    tomorrowAppointments.length < 1 &&
+    upcomingAppointments.length < 1
+  ) {
+    return (
+      <div>
+        <DoctorNavigation />
+        <h1 className="mx-52 my-24 font-montserrat font-bold text-[#006B95] text-2xl">
+          There is no list of appointment yet
+        </h1>
+      </div>
+    );
+  }
+
   return (
     <div>
       <DoctorNavigation />

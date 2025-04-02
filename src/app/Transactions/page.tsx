@@ -4,7 +4,6 @@ import {
   fetchMyAppointment,
   postPaidAppointment,
 } from "../fetchData/fetchAppointment";
-
 import { useState, useEffect } from "react";
 import { Dayjs } from "dayjs";
 import Image from "next/image";

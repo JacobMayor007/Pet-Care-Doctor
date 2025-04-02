@@ -54,7 +54,7 @@ export default function RegisterAs() {
       key: 5,
       label: "Pet Boarding Services",
       icon: faHouseUser,
-      route: "/Renters",
+      route: "https://boarding-pet-care-pro.vercel.app/Sign-Up-Boarding",
     },
   ];
   return (

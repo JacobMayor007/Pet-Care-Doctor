@@ -54,7 +54,7 @@ export default function Login() {
       key: 5,
       label: "Pet Boarding Services",
       type: "renters",
-      route: "/Renters",
+      route: "https://boarding-pet-care-pro.vercel.app/Login",
     },
   ];
 

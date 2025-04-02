@@ -33,7 +33,7 @@ export default function RegisterAsDoctor() {
     contact: "",
     specialty: "",
     subspecialty: "",
-    petTypes: [""],
+    petTypes: [],
     professionalTitle: "",
     clinicAddress: "",
     licenseNumber: "",
@@ -56,44 +56,57 @@ export default function RegisterAsDoctor() {
   ];
 
   const handleSignUp = async () => {
-    const regex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-    if (isSubmitting) return;
-
-    setIsSubmitting(true);
-
-    // Basic Validation
-    if (
-      !formData.fName ||
-      !formData.lName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
-      alert("All fields are required.");
-      setIsSubmitting(false); // Re-enable the button
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      setIsSubmitting(false); // Re-enable the button
-      return;
-    }
-
-    if (!regex.test(formData.password)) {
-      alert(
-        "Please input atleast one uppercase, lowercase, and one special character, and number!"
-      );
-    }
-
-    if (!checkBox) {
-      alert("Please check the terms and conditions");
-      return;
-    }
-
     try {
+      const regex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+      if (isSubmitting) return;
+
+      setIsSubmitting(true);
+
+      // Basic Validation
+      if (
+        !formData.fName ||
+        !formData.lName ||
+        !formData.email ||
+        !formData.password ||
+        !formData.confirmPassword ||
+        !formData.contact ||
+        !formData.specialty ||
+        !formData.subspecialty ||
+        !formData.petTypes ||
+        !formData.professionalTitle ||
+        !formData.clinicAddress ||
+        !formData.licenseNumber ||
+        !formData.universityAttended ||
+        !formData.yearsOfExperience ||
+        !formData.clinicName
+      ) {
+        alert("All fields are required.");
+        setIsSubmitting(false); // Re-enable the button
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        alert("Passwords do not match!");
+        setIsSubmitting(false); // Re-enable the button
+        return;
+      }
+
+      if (!regex.test(formData.password)) {
+        alert(
+          "Please input atleast one uppercase, lowercase, and one special character, and number!"
+        );
+        setIsSubmitting(false); // Re-enable the button
+        return;
+      }
+
+      if (!checkBox) {
+        alert("Please check the terms and conditions");
+        setIsSubmitting(false); // Re-enable the button
+        return;
+      }
+
       // Create user with Firebase Authentication
       const res = await createUserWithEmailAndPassword(
         formData.email,
@@ -123,7 +136,7 @@ export default function RegisterAsDoctor() {
         contact: "",
         specialty: "",
         subspecialty: "",
-        petTypes: [""],
+        petTypes: [],
         professionalTitle: "",
         clinicAddress: "",
         licenseNumber: "",
@@ -143,6 +156,23 @@ export default function RegisterAsDoctor() {
 
   const googleAuth = async () => {
     try {
+      if (
+        !formData.contact ||
+        !formData.specialty ||
+        !formData.subspecialty ||
+        !formData.petTypes ||
+        !formData.professionalTitle ||
+        !formData.clinicAddress ||
+        !formData.licenseNumber ||
+        !formData.universityAttended ||
+        !formData.yearsOfExperience ||
+        !formData.clinicName
+      ) {
+        alert("All fields are required.");
+        setIsSubmitting(false); // Re-enable the button
+        return;
+      }
+
       const result = await signInWithPopup(auth, provider);
       console.log(result.providerId);
 
@@ -152,6 +182,27 @@ export default function RegisterAsDoctor() {
         User_Email: result.user.email,
         User_UID: result.user.uid,
         CreatedAt: Timestamp.now(),
+      });
+
+      const doctorRef = doc(db, "doctor", result.user.uid);
+      await setDoc(doctorRef, {
+        doctor_fullName: formData.fName + formData.lName,
+        doctor_email: formData.email,
+        doctor_uid: result.user.uid,
+        terms_and_conditions: checkBox,
+        createdAt: Timestamp.now(),
+        doctor_info: {
+          contact: formData.contact,
+          specialty: formData.specialty,
+          subspecialty: formData.subspecialty,
+          pet_types_to_treat: formData.petTypes,
+          professional_title: formData.professionalTitle,
+          clinic_name: formData.clinicName,
+          clinic_address: formData.clinicAddress,
+          license_number: formData.licenseNumber,
+          university_last_attended: formData.universityAttended,
+          years_of_experience: formData.yearsOfExperience,
+        },
       });
 
       if (result) {
@@ -166,6 +217,23 @@ export default function RegisterAsDoctor() {
 
   const facebookAuth = async () => {
     try {
+      if (
+        !formData.contact ||
+        !formData.specialty ||
+        !formData.subspecialty ||
+        !formData.petTypes ||
+        !formData.professionalTitle ||
+        !formData.clinicAddress ||
+        !formData.licenseNumber ||
+        !formData.universityAttended ||
+        !formData.yearsOfExperience ||
+        !formData.clinicName
+      ) {
+        alert("All fields are required.");
+        setIsSubmitting(false); // Re-enable the button
+        return;
+      }
+
       const result = await signInWithPopup(
         getAuth(),
         new FacebookAuthProvider()
@@ -176,6 +244,27 @@ export default function RegisterAsDoctor() {
         User_Email: result.user.email,
         User_UID: result.user.uid,
         CreatedAt: Timestamp.now(),
+      });
+
+      const doctorRef = doc(db, "doctor", result.user.uid);
+      await setDoc(doctorRef, {
+        doctor_fullName: formData.fName + formData.lName,
+        doctor_email: formData.email,
+        doctor_uid: result.user.uid,
+        terms_and_conditions: checkBox,
+        createdAt: Timestamp.now(),
+        doctor_info: {
+          contact: formData.contact,
+          specialty: formData.specialty,
+          subspecialty: formData.subspecialty,
+          pet_types_to_treat: formData.petTypes,
+          professional_title: formData.professionalTitle,
+          clinic_name: formData.clinicName,
+          clinic_address: formData.clinicAddress,
+          license_number: formData.licenseNumber,
+          university_last_attended: formData.universityAttended,
+          years_of_experience: formData.yearsOfExperience,
+        },
       });
       if (result) {
         router.push("/");
@@ -524,7 +613,7 @@ export default function RegisterAsDoctor() {
                   allowClear
                   options={options}
                   onChange={(value) =>
-                    setFormData({ ...formData, petTypes: [value] })
+                    setFormData({ ...formData, petTypes: value })
                   }
                   className="h-full w-full text-nowrap overflow-y-scroll outline-none"
                 />
