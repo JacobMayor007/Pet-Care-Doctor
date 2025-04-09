@@ -5,14 +5,16 @@ import { FacebookOutlined, GoogleOutlined } from "@ant-design/icons";
 import { FacebookAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { doc, getFirestore, setDoc, Timestamp } from "firebase/firestore";
 import Image from "next/image";
+import "@ant-design/v5-patch-for-react-19";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import RegisterAs from "../RegisterAs/page";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { Select } from "antd";
+import { Select, TimePicker } from "antd";
 import Link from "next/link";
+import { Dayjs } from "dayjs";
 
 export default function RegisterAsDoctor() {
   const specialtyRef = useRef<HTMLInputElement>(null);
@@ -40,12 +42,59 @@ export default function RegisterAsDoctor() {
     universityAttended: "",
     yearsOfExperience: 0,
     clinicName: "",
+    User_AvailableHours: {
+      Days: [],
+    },
+    Time_In: "",
+    Time_Out: "",
   });
+
+  const weeks = [
+    {
+      key: 0,
+      value: 0,
+      label: "Sunday",
+    },
+    {
+      key: 1,
+      value: 1,
+      label: "Monday",
+    },
+    {
+      key: 2,
+      value: 2,
+      label: "Tuesday",
+    },
+    {
+      key: 3,
+      value: 3,
+      label: "Wednesday",
+    },
+    {
+      key: 4,
+      value: 4,
+      label: "Thursday",
+    },
+    {
+      key: 5,
+      value: 5,
+      label: "Friday",
+    },
+    {
+      key: 6,
+      value: 6,
+      label: "Saturday",
+    },
+  ];
+
   const router = useRouter();
 
   const [createUserWithEmailAndPassword, loading] =
     useCreateUserWithEmailAndPassword(auth);
   const db = getFirestore();
+
+  console.log(formData.Time_In);
+  console.log(formData.Time_Out);
 
   const options = [
     { label: "Dogs", value: "dogs" },
@@ -54,6 +103,8 @@ export default function RegisterAsDoctor() {
     { label: "Reptiles", value: "reptiles" },
     { label: "Exotic Animal", value: "exotic animal" },
   ];
+
+  console.log(formData.fName + " " + formData.lName);
 
   const handleSignUp = async () => {
     try {
@@ -80,7 +131,10 @@ export default function RegisterAsDoctor() {
         !formData.licenseNumber ||
         !formData.universityAttended ||
         !formData.yearsOfExperience ||
-        !formData.clinicName
+        !formData.clinicName ||
+        !formData.Time_In ||
+        !formData.Time_Out ||
+        !formData.User_AvailableHours
       ) {
         alert("All fields are required.");
         setIsSubmitting(false); // Re-enable the button
@@ -98,6 +152,11 @@ export default function RegisterAsDoctor() {
           "Please input atleast one uppercase, lowercase, and one special character, and number!"
         );
         setIsSubmitting(false); // Re-enable the button
+        return;
+      }
+
+      if (!formData.email.includes("@")) {
+        alert("Invalid Email Address");
         return;
       }
 
@@ -119,11 +178,33 @@ export default function RegisterAsDoctor() {
       // Add user data to Firestore
       const userRef = doc(db, "Users", res.user.uid);
       await setDoc(userRef, {
-        User_Name: formData.fName + formData.lName,
+        User_Name: formData.fName + " " + formData.lName,
         User_Email: formData.email,
         User_UID: res.user.uid,
         TermsAndConditions: checkBox,
         CreatedAt: Timestamp.now(),
+      });
+
+      const doctorRef = doc(db, "doctor", res.user.uid);
+      await setDoc(doctorRef, {
+        createdAt: Timestamp.now(),
+        doctor_email: formData.email,
+        doctor_uid: res.user.uid,
+        doctor_name: formData.fName + " " + formData.lName,
+        doctor_title: formData.professionalTitle,
+        doctor_contact: formData.contact,
+        doctor_clinicAddress: formData.clinicAddress,
+        doctor_clinicName: formData.clinicName,
+        doctor_pet_types_treated: formData.petTypes,
+        doctor_specialty: formData.specialty,
+        doctor_sub_specialty: formData.subspecialty,
+        doctor_experience: formData.yearsOfExperience,
+        doctor_university_attended: formData.universityAttended,
+        doctor_license_number: formData.licenseNumber,
+        doctor_available_days: formData.User_AvailableHours.Days,
+        doctor_time_in: formData.Time_In,
+        doctor_time_out: formData.Time_Out,
+        termsAndConditions: checkBox,
       });
 
       // Clear input fields
@@ -143,6 +224,11 @@ export default function RegisterAsDoctor() {
         universityAttended: "",
         yearsOfExperience: 0,
         clinicName: "",
+        User_AvailableHours: {
+          Days: [],
+        },
+        Time_In: "",
+        Time_Out: "",
       });
 
       // Redirect to login page or home page
@@ -280,8 +366,8 @@ export default function RegisterAsDoctor() {
   console.log(formData.petTypes);
 
   return (
-    <div className="bg-[#9FE1DB] bg-signUp h-screen">
-      <div className="xl:h-full 2xl:h-screen flex flex-row">
+    <div className="bg-[#9FE1DB] bg-signUp h-full">
+      <div className="h-fit flex flex-row">
         <div className="w-[30%]">
           <h1 className="text-5xl font-sigmar font-normal text-white mt-10 text-center">
             Pet Care Pro
@@ -294,7 +380,7 @@ export default function RegisterAsDoctor() {
             className="object-contain mt-8"
           />
         </div>
-        <div className="w-[70%] rounded-[25px_0px_0px_25px] z-[2] bg-white flex flex-col px-20 gap-7">
+        <div className="w-[70%] rounded-[25px_0px_0px_25px] z-[2] bg-white flex flex-col px-20 gap-7 h-fit">
           <div className="mt-5 flex flex-row items-center justify-between gap-2">
             <div className="flex flex-row items-center gap-2">
               <Image
@@ -417,9 +503,9 @@ export default function RegisterAsDoctor() {
                   <option value="MVZ">
                     Médico Veterinario Zootecnista (MVZ)
                   </option>
-                  <option value="Dr. med. vet.">
-                    Doctor Medicinae Veterinariae (Dr. med. vet.)
-                  </option>
+                  <option value="Dr.">Doctor (Dr.)</option>
+                  <option value="med.">Medicinae( med.)</option>
+                  <option value="vet.">Veterinariae(vet.)</option>
                 </select>
               </div>
             </div>
@@ -670,7 +756,24 @@ export default function RegisterAsDoctor() {
                     <option value="Surgery">Surgery</option>
                     <option value="Dentistry">Dentistry</option>
                     <option value="Dermatology">Dermatology</option>
-                    <option value="General Practice">General Practice</option>
+                    <option value="Anesthesia">Anesthesia</option>
+                    <option value="Behavior">Behavior</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Internal Medicine">Internal Medicine</option>
+                    <option value="Neurology">Neurology</option>
+                    <option value="Oncology">Oncology</option>
+                    <option value="Ophthalmology">Ophthalmology</option>
+                    <option value="Theriogenology">Theriogenology</option>
+                    <option value="Exotic Companion Mammal Practice">
+                      Exotic Companion Mammal Practice
+                    </option>
+                    <option value="Avian Medicine">Avian Medicine</option>
+                    <option value="Reptile/Amphibian Practice">
+                      Reptile/Amphibian Practice
+                    </option>
+                    <option value="Canine/Feline Practice">
+                      Canine/Feline Practice
+                    </option>
                     <option value="Others">Others</option>
                   </select>
                 )}
@@ -821,6 +924,82 @@ export default function RegisterAsDoctor() {
                     setFormData({
                       ...formData,
                       licenseNumber: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-5">
+              <div className="relative border-[1px] border-black rounded-md h-fit py-2 flex flex-row items-center px-2">
+                <label
+                  htmlFor="available-days-id"
+                  className="absolute left-7 -top-3 bg-white text-sm  font-hind"
+                >
+                  Available Days
+                  <span className="text-red-500 text-sm font-montserrat ">
+                    *
+                  </span>
+                </label>
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Available Days"
+                  options={weeks}
+                  className=" h-fit w-full"
+                  onChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      User_AvailableHours: { Days: value },
+                    })
+                  }
+                />
+              </div>
+              <div className="relative border-[1px] border-black rounded-md flex items-center gap-4 px-2 ">
+                <label
+                  htmlFor="available-time-from-id"
+                  className="absolute left-7 -top-3 bg-white h-fit text-sm font-hind"
+                >
+                  Available Time
+                  <span className="text-red-500 text-sm font-montserrat ">
+                    *
+                  </span>
+                </label>
+                {/* <input
+                  type="text"
+                  name="licenseNumber"
+                  id="license-number-id"
+                  className="h-12 w-full border-[1px] border-solid border-black outline-none rounded-md font-hind text-base px-2"
+                  value={formData.licenseNumber}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      licenseNumber: e.target.value,
+                    })
+                  }
+                /> */}
+
+                <TimePicker
+                  placeholder="Time-in"
+                  className="h-9"
+                  format={"hh:mm A "}
+                  use12Hours
+                  onChange={(date: Dayjs) =>
+                    setFormData({
+                      ...formData,
+                      Time_In: date.format("hh:mm A"),
+                    })
+                  }
+                />
+                <TimePicker
+                  placeholder="Time-out"
+                  className="h-9"
+                  format={"hh:mm A "}
+                  use12Hours
+                  onChange={(date: Dayjs) =>
+                    setFormData({
+                      ...formData,
+                      Time_Out: date.format("hh:mm A"),
                     })
                   }
                 />

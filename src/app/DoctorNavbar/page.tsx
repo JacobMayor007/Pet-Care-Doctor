@@ -288,11 +288,11 @@ export default function DoctorNavigation() {
               <div
                 className={
                   unreadNotif > 0
-                    ? `flex absolute -top-2 right-12 h-4 w-4 text-xs bg-red-500 cursor-pointer text-white rounded-full justify-center items-center`
+                    ? `flex absolute -top-2 left-8 h-4 w-4 text-xs bg-red-500 cursor-pointer text-white rounded-full justify-center items-center`
                     : `hidden`
                 }
               >
-                {unreadNotif < 0 ? `` : unreadNotif}
+                {unreadNotif < 0 ? `2` : unreadNotif}
               </div>
 
               <UserOutlined
@@ -302,17 +302,17 @@ export default function DoctorNavigation() {
                   setShowNotif(showNotif === true ? false : false);
                 }}
               />
-              <h1 className="text-[#006B95] capitalize font-bold text-lg  ">
-                {userData[0]?.User_Name}
-              </h1>
 
               <div
                 className={
                   logout
-                    ? `grid grid-rows-6 justify-center items-center bg-[#F3F3F3] drop-shadow-xl rounded-lg absolute top-10 -left-3 cursor-pointer h-fit w-56`
+                    ? `grid grid-rows-7  justify-center items-center bg-[#F3F3F3] drop-shadow-xl rounded-lg absolute top-10 -left-3 cursor-pointer h-fit w-56`
                     : `hidden`
                 }
               >
+                <h1 className="text-[#006B95] border-b-[1px] border-[#B1B1B1] text-center capitalize font-bold text-lg  ">
+                  {userData[0]?.User_Name}
+                </h1>
                 <Link
                   href={`/Profile/Doctor/${userUID}`}
                   className="text-center font-hind  h-full w-44 flex items-center justify-center border-b-[1px] border-[#B1B1B1]"
@@ -448,8 +448,8 @@ function NotificationList() {
                 data?.status === "read" ? ` col-span-12` : `col-span-11`
               }`}
             >
-              <a
-                href={`/Doctor/PatientDetails/${data?.appointment_ID}`}
+              <Link
+                href={`/PatientDetails/${data?.appointment_ID}`}
                 onClick={() => Notification.readNotification(data?.id || "")}
                 className="col-span-11 grid grid-cols-5 w-full items-center"
               >
@@ -468,7 +468,7 @@ function NotificationList() {
                     </p>
                   </div>
                 </div>
-              </a>
+              </Link>
               <div className="relative">
                 <div
                   onClick={() => Notification.hideNotification(data?.id || "")}

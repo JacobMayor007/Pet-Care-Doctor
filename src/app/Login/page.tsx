@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { isAuthenticate } from "../fetchData/fetchUserData";
 import { signingIn } from "../fetchData/fetchUserData";
 import { auth, db, fbprovider, provider } from "../firebase/config";
-import { signInWithPopup } from "firebase/auth";
+import { getAuth, signInWithPopup, signOut } from "firebase/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -79,16 +79,17 @@ export default function Login() {
     try {
       setLoading(true);
 
-      if (userType === "client") {
-        await signingIn(email, password);
-        return router.push(userRoute);
-      }
-      const docRef = collection(db, userType);
-      const q = query(docRef, where("User_Email", "==", email));
+      const docRef = collection(db, "doctor");
+      const q = query(docRef, where("doctor_email", "==", email));
       const docSnap = await getDocs(q);
       if (!docSnap.empty) {
-        await signingIn(email, password);
-        return router.push(`${userRoute}`);
+        const result = await signingIn(email, password);
+        if (result) {
+          return router.push(`/`);
+        } else {
+          alert("Invalid Email, and Password. Please try again!");
+          return router.push("/Login");
+        }
       } else
         return (
           router.push("/Login"),
@@ -120,25 +121,26 @@ export default function Login() {
 
   const googleAuth = async () => {
     try {
-      if (userType === "client") {
-        await signInWithPopup(auth, provider);
-        return router.push("/");
-      }
+      const result = await signInWithPopup(auth, provider);
 
       const docRef = collection(db, userType);
-      const q = query(docRef, where("User_Email", "==", email));
+      const q = query(docRef, where("doctor_email", "==", result.user.email));
       const docSnap = await getDocs(q);
 
       if (!docSnap.empty) {
-        await signInWithPopup(auth, provider);
-        return router.push(`${userRoute}`);
-      } else
+        return router.push(`/`);
+      } else {
+        const auth = getAuth();
+        signOut(auth).then(() => {
+          router.push("/Login");
+        });
         return (
           router.push("/Login"),
           alert(
             `This account is does not exist on ${loginAs}, go to the Sign Up Page if you want to register as ${loginAs}`
           )
         );
+      }
     } catch (error) {
       console.error(error);
     }
@@ -146,25 +148,26 @@ export default function Login() {
 
   const facebookAuth = async () => {
     try {
-      if (userType === "client") {
-        await signInWithPopup(auth, fbprovider);
-        router.push("/");
-      }
+      const result = await signInWithPopup(auth, fbprovider);
 
       const docRef = collection(db, userType);
-      const q = query(docRef, where("User_Email", "==", email));
+      const q = query(docRef, where("doctor_email", "==", result.user.email));
       const docSnap = await getDocs(q);
 
       if (!docSnap.empty) {
-        await signInWithPopup(auth, fbprovider);
         return router.push(`${userRoute}`);
-      } else
+      } else {
+        const auth = getAuth();
+        signOut(auth).then(() => {
+          router.push("/Login");
+        });
         return (
           router.push("/Login"),
           alert(
             `This account is does not exist on ${loginAs}, go to the Sign Up Page if you want to register as ${loginAs}`
           )
         );
+      }
     } catch (error) {
       console.error(error);
     }
@@ -257,9 +260,7 @@ export default function Login() {
               />
               <div className="absolute right-4 bottom-4">
                 <Image
-                  src={
-                    showPassword ? `./Eyeopen.png` : `./icon _eye close_.svg`
-                  }
+                  src={showPassword ? `/Eyeopen.png` : `/icon _eye close_.svg`}
                   height={33.53}
                   width={19}
                   alt="Show Password icon"
