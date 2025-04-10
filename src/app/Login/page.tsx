@@ -178,7 +178,7 @@ export default function Login() {
       <div className="h-fit w-[600px] bg-white rounded-[20px] flex flex-col items-center p-11 gap-6">
         <div className="flex flex-row w-full justify-between items-center gap-1">
           <Image
-            src="./Logo.svg"
+            src="/Logo.svg"
             height={60}
             width={60}
             alt="Pet Care Logo"

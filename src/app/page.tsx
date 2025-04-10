@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import DoctorNavigation from "./DoctorNavbar/page";
-import fetchUserData from "./fetchData/fetchUserData";
+import fetchUserData, { isAuthenticate } from "./fetchData/fetchUserData";
 import {
   fetchMyAppointment,
   myNewPatient,
@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import dayjs, { Dayjs } from "dayjs";
 import "@ant-design/v5-patch-for-react-19";
+import { useRouter } from "next/navigation";
 
 interface Appointments {
   id?: string;
@@ -43,6 +44,7 @@ interface Appointments {
 
 export default function Doctor() {
   const [fullName, setFullName] = useState<string | null>("");
+  const [userId, setUserId] = useState("");
   const [todayAppointments, setTodayAppointments] = useState<Appointments[]>(
     []
   );
@@ -56,19 +58,36 @@ export default function Doctor() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [oldPatient, setOldPatient] = useState(0);
 
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      const login = await isAuthenticate();
+      if (!login) {
+        router.push("/Login");
+      }
+    };
+
+    checkAuthentication();
+  }, [router]);
+
   useEffect(() => {
     const getUserData = async () => {
       try {
         const data = await fetchUserData();
         const fullName = data[0]?.User_Name;
+        const userid = data[0]?.User_UID;
 
         setFullName(fullName);
+        setUserId(userid);
       } catch (error) {
         console.error("Error on fetching UserData", error);
       }
     };
     getUserData();
   }, []);
+
+  console.log(userId);
 
   useEffect(() => {
     const getMyAppointments = async () => {
@@ -183,9 +202,14 @@ export default function Doctor() {
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
+  if (!userId) {
+    return (
+      <div>
+        <div></div>
+      </div>
+    );
+  }
   if (loading) return <LoadingPage />;
-
-  console.log("Today Appointments: ", todayAppointments);
 
   return (
     <div className="h-full">
