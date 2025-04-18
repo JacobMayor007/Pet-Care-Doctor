@@ -55,6 +55,7 @@ export default function Doctor() {
   const [appointmentsForDate, setAppointmentsForDate] = useState<
     Appointments[]
   >([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [oldPatient, setOldPatient] = useState(0);
 
@@ -112,8 +113,6 @@ export default function Doctor() {
     getMyAppointments();
   }, []);
 
-  console.log("The dates of appointment:", myAppointment);
-
   useEffect(() => {
     const getMyNewPatient = async () => {
       try {
@@ -151,10 +150,10 @@ export default function Doctor() {
   }, []);
 
   const cellRender = (date: Dayjs) => {
-    const formattedDate = date.format("YYYY-MM-DD");
+    const formattedDate = date.format("MMMM DD, YYYY");
     const appointmentsForDay = myAppointment.filter(
       (appointment) =>
-        appointment.Appointment_Date?.format("YYYY-MM-DD") === formattedDate
+        appointment.Appointment_Date?.format("MMMM DD, YYYY") === formattedDate
     );
 
     // Show only the first appointment, and the rest with ellipsis

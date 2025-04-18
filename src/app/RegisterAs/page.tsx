@@ -47,7 +47,7 @@ export default function RegisterAs() {
       key: 4,
       label: "Pet Memorial",
       icon: faDove,
-      route: "/Funeral",
+      route: "https://memorial-pet-care-pro.vercel.app/Sign-Up-Memorial",
     },
 
     {
