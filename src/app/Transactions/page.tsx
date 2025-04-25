@@ -9,6 +9,7 @@ import { Dayjs } from "dayjs";
 import Image from "next/image";
 import { Modal } from "antd";
 import "@ant-design/v5-patch-for-react-19";
+import Link from "next/link";
 
 interface myAppointments {
   id?: string;
@@ -61,7 +62,7 @@ export default function Transaction() {
       </div>
       <div className="flex mx-52 my-10 flex-col gap-8 z-10">
         <h1 className="font-bold font-montserrat text-4xl ">Transactions</h1>
-        <div className="grid grid-cols-5 bg-white drop-shadow-lg h-fit rounded-2xl p-8 gap-5">
+        <div className="grid grid-cols-5 bg-white drop-shadow-lg h-fit rounded-2xl p-8 gap-5 ">
           <h1
             className={`${
               paid ? `col-span-3` : `col-span-2`
@@ -80,7 +81,7 @@ export default function Transaction() {
             return (
               <div
                 key={data?.id}
-                className="grid grid-cols-5 col-span-5 items-center px-4 py-6 border-b-[1px] border-[#C3C3C3]"
+                className="grid grid-cols-5 col-span-5 items-center px-4 py-6 border-b-[1px] border-[#C3C3C3] relative"
               >
                 <div className="">
                   <h1 className="font-hind font-bold">
@@ -88,9 +89,9 @@ export default function Transaction() {
                   </h1>
                 </div>
                 <div
-                  className={`${
-                    !data?.Appointment_isPaid ? `col-span-1` : `col-span-2`
-                  } flex flex-col gap-0.5`}
+                  className={`
+                     col-span-2
+                   flex flex-col gap-0.5`}
                 >
                   <p className="font-hind font-bold text-[#006B95]">
                     Owner: {data?.Appointment_PatientFullName}
@@ -115,12 +116,8 @@ export default function Transaction() {
                 <div className="justify-self-center font-hind text-[#232323] text-xl font-medium">
                   Php {data?.Appointment_Price}
                 </div>
-                <h1 className="justify-self-center font-montserrat font-bold text-[#006B95] text-xl">
-                  {data?.Appointment_isPaid
-                    ? `Paid`
-                    : `${data?.Appointment_Status}`}
-                </h1>
-                {!data?.Appointment_isPaid ? (
+
+                {data?.Appointment_Status === "Approved" ? (
                   <button
                     type="button"
                     className=" h-fit py-2 w-fit px-4 ml-8 bg-[#006B95] text-white rounded-md"
@@ -129,8 +126,16 @@ export default function Transaction() {
                     Click here if Paid
                   </button>
                 ) : (
-                  <button className="hidden" />
+                  <h1 className="font-montserrat font-bold text-[#393939] text-center">
+                    {data?.Appointment_Status === "isPending" && "Pending"}
+                  </h1>
                 )}
+                <Link
+                  href={`PatientDetails/${data?.id}`}
+                  className="font-montserrat italic underline text-[#006B95] text-center absolute -top-4 -right-5"
+                >
+                  View Patient
+                </Link>
 
                 <Modal
                   open={confirmPaid}

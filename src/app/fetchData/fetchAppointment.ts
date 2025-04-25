@@ -207,10 +207,9 @@ const fetchPatientDetails = async (appointment_ID:string): Promise <Appointment 
 //   };
 
 
-const postApprovedAppointment = async (appointment_ID:string, time: string, price:number) =>{
+const postApprovedAppointment = async (appointment_ID:string, time: string) =>{
   console.log("Appointment ID ", appointment_ID);
   
-
   try{
     if (!appointment_ID ) {
       throw new Error("Invalid appointment ID");
@@ -223,7 +222,6 @@ const postApprovedAppointment = async (appointment_ID:string, time: string, pric
       const updated = await updateDoc(docRef, {
         Appointment_Status: "Approved",
         Appointment_Time: time,
-        Appointment_Price: price,
       });
       return updated;
     } else {

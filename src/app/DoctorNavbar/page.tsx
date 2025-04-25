@@ -12,7 +12,7 @@ import myNotification, {
 import * as Notification from "../fetchData/fetchNotification";
 
 import fetchUserData from "@/app/fetchData/fetchUserData";
-import { UserOutlined, SearchOutlined, BellOutlined } from "@ant-design/icons";
+import { UserOutlined, BellOutlined } from "@ant-design/icons";
 import { Modal } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -275,8 +275,6 @@ export default function DoctorNavigation() {
           </ul>
           <div className="flex items-center gap-4" ref={btnNotif}>
             <div className="relative flex gap-2">
-              <SearchOutlined className="text-[#006B95] font-bold text-lg cursor-pointer" />
-
               <BellOutlined
                 onClick={() => {
                   setShowNotif((prev) => !prev);
@@ -320,28 +318,28 @@ export default function DoctorNavigation() {
                   My Profile
                 </Link>
                 <Link
-                  href={`/find-my-buddy`}
-                  className="text-center font-hind  h-full w-44 flex items-center justify-center border-b-[1px] border-[#B1B1B1]"
-                >
-                  Want to find your buddy?
-                </Link>
-                <Link
-                  href={`/Doctor`}
-                  className="text-center font-hind  h-full w-44 flex items-center justify-center border-b-[1px] border-[#B1B1B1]"
-                >
-                  Want to become part of our doctors?
-                </Link>
-                <Link
-                  href={`/Provider`}
+                  href={`https://seller-pet-care-pro.vercel.app/Login`}
                   className="text-center font-hind  h-full w-44 flex items-center justify-center border-b-[1px] border-[#B1B1B1]"
                 >
                   Want to become part of our product sellers?
                 </Link>
                 <Link
-                  href={`/Renter`}
+                  href={`https://boarding-pet-care-pro.vercel.app/Login`}
                   className="text-center font-hind  h-full w-44 flex items-center justify-center border-b-[1px] border-[#B1B1B1]"
                 >
                   Want to become part of our renters?
+                </Link>
+                <Link
+                  href={`https://memorial-pet-care-pro.vercel.app/Login`}
+                  className="text-center font-hind  h-full w-44 flex items-center justify-center border-b-[1px] border-[#B1B1B1]"
+                >
+                  Want to become part of our memorials?
+                </Link>
+                <Link
+                  href={`https://sitter-pet-care-pro.vercel.app/Login`}
+                  className="text-center font-hind  h-full w-44 flex items-center justify-center border-b-[1px] border-[#B1B1B1]"
+                >
+                  Want to become part of our pet sitter?
                 </Link>
                 <Link
                   href={`/Settings`}
@@ -423,7 +421,7 @@ function NotificationList() {
   };
 
   return (
-    <div className="max-w-[500px] w-[482px] h-fit max-h-[542px] bg-white drop-shadow-lg rounded-xl justify-self-center flex flex-col pb-1">
+    <div className="max-w-[500px] w-[482px] h-fit max-h-[542px] bg-white drop-shadow-lg rounded-xl justify-self-center flex flex-col pb-1 overflow-y-scroll">
       <h1 className="font-hind text-lg mx-4 mt-4 mb-2">Notifications</h1>
       <div className="h-0.5 border-[#393939] w-full border-[1px] mb-2" />
       {notif.map((data) => {

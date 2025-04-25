@@ -8,8 +8,6 @@ import {
   myOldPatient,
 } from "./fetchData/fetchAppointment";
 import { Calendar, Modal, List } from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import dayjs, { Dayjs } from "dayjs";
 import "@ant-design/v5-patch-for-react-19";
 import { useRouter } from "next/navigation";
@@ -263,12 +261,7 @@ export default function Doctor() {
                 <h1 className="font-montserrat font-semibold text-[#393939]">
                   Today
                 </h1>
-                <div className="flex justify-end items-center">
-                  <FontAwesomeIcon
-                    icon={faEllipsisVertical}
-                    className="text-[#756D78]"
-                  />
-                </div>
+
                 <div className="border-[1px] border-[#b1b1b1] rounded-full w-full col-span-2" />
                 {todayAppointments.map((data) => {
                   return (
