@@ -83,7 +83,7 @@ export default function Transaction() {
         isApproved: true,
       });
     } catch (error) {
-      console.error();
+      console.error(error);
     }
   };
 

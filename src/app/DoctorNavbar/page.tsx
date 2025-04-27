@@ -54,7 +54,6 @@ export default function DoctorNavigation() {
   const [unreadNotif, setUnreadNotif] = useState(0);
   const [logout, setLogout] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
-  const [userUID, setUserUID] = useState("");
   const [userData, setUserData] = useState<DocumentData[]>([]);
 
   const auth = getAuth();
@@ -65,7 +64,6 @@ export default function DoctorNavigation() {
         router.push("/Login");
       } else {
         setDoctor_UID(user?.uid);
-        setUserUID(user?.uid);
       }
     });
     return () => unsubscribe();
