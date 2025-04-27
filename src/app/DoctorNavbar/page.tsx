@@ -81,6 +81,7 @@ export default function DoctorNavigation() {
     const closeNotification = (e: MouseEvent) => {
       if (!btnNotif.current?.contains(e.target as Node)) {
         setShowNotif(false);
+        setLogout(false);
       }
     };
 
