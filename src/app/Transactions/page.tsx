@@ -10,6 +10,8 @@ import Image from "next/image";
 import { Modal } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import Link from "next/link";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 interface myAppointments {
   id?: string;
@@ -39,12 +41,16 @@ interface myAppointments {
   Appointment_TypeOfAppointment?: string;
   Appointment_Price?: number;
   Appointment_isPaid?: boolean;
+  Appointment_Time?: string;
 }
 
 export default function Transaction() {
   const [myAppointments, setMyAppointments] = useState<myAppointments[]>([]);
   const paid = myAppointments.map((data) => data?.Appointment_isPaid);
   const [confirmPaid, setConfirmPaid] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<myAppointments | null>(
+    null
+  );
 
   useEffect(() => {
     const getMyAppointment = async () => {
@@ -54,6 +60,32 @@ export default function Transaction() {
     };
     getMyAppointment();
   }, []);
+
+  const paidNotificationHandle = async () => {
+    try {
+      const docRef = collection(db, "notifications");
+      await addDoc(docRef, {
+        appointment_ID: selectedPatient?.id,
+        sender: selectedPatient?.Appointment_DoctorUID,
+        sender_FullName: selectedPatient?.Appointment_DoctorName,
+        receiver_FullName: selectedPatient?.Appointment_PatientFullName,
+        receiverID: selectedPatient?.Appointment_PatientUserUID,
+        title: `Paid Notification`,
+        message: `Dr. ${
+          selectedPatient?.Appointment_DoctorName
+        } have received your payment on your appointment at, ${selectedPatient?.Appointment_Date?.format(
+          "MMMM DD, YYYY"
+        )} ${selectedPatient?.Appointment_Time}`,
+        createdAt: Timestamp.now(),
+        hide: false,
+        open: false,
+        status: "unread",
+        isApproved: true,
+      });
+    } catch (error) {
+      console.error();
+    }
+  };
 
   return (
     <div>
@@ -121,13 +153,17 @@ export default function Transaction() {
                   <button
                     type="button"
                     className=" h-fit py-2 w-fit px-4 ml-8 bg-[#006B95] text-white rounded-md"
-                    onClick={() => setConfirmPaid(true)}
+                    onClick={() => {
+                      setConfirmPaid(true);
+                      setSelectedPatient(data);
+                    }}
                   >
                     Click here if Paid
                   </button>
                 ) : (
-                  <h1 className="font-montserrat font-bold text-[#393939] text-center">
+                  <h1 className="font-montserrat font-bold text-[#393939] text-center text-2xl">
                     {data?.Appointment_Status === "isPending" && "Pending"}
+                    {data?.Appointment_Status === "Paid" && "Paid"}
                   </h1>
                 )}
                 <Link
@@ -136,27 +172,30 @@ export default function Transaction() {
                 >
                   View Patient
                 </Link>
-
-                <Modal
-                  open={confirmPaid}
-                  onOk={() => {
-                    setConfirmPaid(false);
-                    postPaidAppointment(data?.id || "");
-                  }}
-                  centered
-                  onClose={() => setConfirmPaid(false)}
-                  onCancel={() => setConfirmPaid(false)}
-                >
-                  <h1 className="font-montserrat font-bold text-[#006B95]">
-                    Please confirm that patient{" "}
-                    {data?.Appointment_PatientFullName} is paid?
-                  </h1>
-                </Modal>
               </div>
             );
           })}
         </div>
       </div>
+      <Modal
+        open={confirmPaid}
+        onOk={() => {
+          setConfirmPaid(false);
+          paidNotificationHandle();
+          postPaidAppointment(selectedPatient?.id || "");
+        }}
+        centered
+        onClose={() => setConfirmPaid(false)}
+        onCancel={() => setConfirmPaid(false)}
+      >
+        <h1 className="font-montserrat font-bold ">
+          Please confirm that patient{" "}
+          <span className="text-[#006B95] capitalize">
+            {selectedPatient?.Appointment_PatientFullName}
+          </span>{" "}
+          is paid?
+        </h1>
+      </Modal>
     </div>
   );
 }

@@ -295,7 +295,8 @@ const postPaidAppointment = async (appointmentID:string) => {
 
     if(appointmentSnap.exists()){
       const paidAppointment = await updateDoc(appointmentRef, {
-        Appointment_isPaid: true
+        Appointment_Status: "Paid"
+
       })
       return paidAppointment;
     }

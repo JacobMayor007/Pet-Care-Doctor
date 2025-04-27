@@ -368,7 +368,7 @@ export default function PatientDetails({ params }: DetailsProps) {
     } catch (error) {
       console.log(error);
     } finally {
-      router.push(`/Doctor/PatientDetails/${pendingAppointments?.id}`);
+      router.push(`/PatientDetails/${pendingAppointments?.id}`);
     }
   };
 
@@ -542,10 +542,14 @@ export default function PatientDetails({ params }: DetailsProps) {
               centered={true}
               onClose={() => setAccept(false)}
               onOk={() => {
+                if (!time) {
+                  alert("Input Time");
+                  return;
+                }
                 notifyDate();
                 setAccept(false);
                 Appointment.postApprovedAppointment(id || "", time);
-                router.push(`/Doctor/PatientDetails/${id}`);
+                window.location.reload();
               }}
             >
               <h1 className="font-montserrat text-[#393939] font-medium">
@@ -714,12 +718,14 @@ export default function PatientDetails({ params }: DetailsProps) {
               ) : (
                 <div
                   className={
-                    pendingAppointments?.Appointment_Status === "Approved"
+                    pendingAppointments?.Appointment_Status
                       ? `flex flex-col gap-7`
                       : `hidden`
                   }
                 >
-                  <h1>Patient Information</h1>
+                  <h1 className="font-montserrat font-bold text-lg text-[#393939]">
+                    Patient Information
+                  </h1>
                   <div className="w-full border-[#B1B1B1] border-[1px]" />
                   <div className="grid grid-cols-5 gap-2">
                     <label
@@ -918,7 +924,7 @@ export default function PatientDetails({ params }: DetailsProps) {
               onOk={() => {
                 submitPatientInformation();
                 setConfirmPatientInfo(false);
-                router.push(`/Doctor/PatientDetails/${id}`);
+                router.push(`/PatientDetails/${id}`);
               }}
               centered
             >

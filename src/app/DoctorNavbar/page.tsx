@@ -127,46 +127,6 @@ export default function DoctorNavigation() {
     };
   }, [doctor_UID]);
 
-  // useEffect(() => {
-  //     if (!id) {
-  //       console.error("No Appointment ID provided.");
-  //       return;
-  //     }
-
-  //     let unsubscribe: (() => void) | undefined;
-
-  //     const fetchAppointment = async () => {
-  //       try {
-  //         unsubscribe = await Appointment.default(id, (appointmentData) => {
-  //           if (appointmentData) {
-  //             // ✅ Properly convert Firestore Timestamp to Dayjs
-  //             const appointmentDate = appointmentData.Appointment_Date
-  //               ? dayjs((appointmentData.Appointment_Date as Timestamp).toDate())
-  //               : null;
-
-  //             setAppointment({
-  //               ...appointmentData,
-  //               Appointment_Date: appointmentDate,
-  //             });
-  //           } else {
-  //             console.warn("Appointment not found.");
-  //             setAppointment(null);
-  //           }
-  //         });
-  //       } catch (error) {
-  //         console.error("Error fetching appointment:", error);
-  //       }
-  //     };
-
-  //     fetchAppointment();
-
-  //     return () => {
-  //       if (unsubscribe) {
-  //         unsubscribe();
-  //       }
-  //     };
-  //   }, [id]);
-
   const latestChats = async () => {
     try {
       if (!userData[0]?.User_Email) {
@@ -286,7 +246,7 @@ export default function DoctorNavigation() {
               <div
                 className={
                   unreadNotif > 0
-                    ? `flex absolute -top-2 left-8 h-4 w-4 text-xs bg-red-500 cursor-pointer text-white rounded-full justify-center items-center`
+                    ? `flex absolute -top-2 left-2 h-4 w-4 text-xs bg-red-500 cursor-pointer text-white rounded-full justify-center items-center`
                     : `hidden`
                 }
               >
@@ -311,12 +271,12 @@ export default function DoctorNavigation() {
                 <h1 className="text-[#006B95] border-b-[1px] border-[#B1B1B1] text-center capitalize font-bold text-lg  ">
                   {userData[0]?.User_Name}
                 </h1>
-                <Link
-                  href={`/Profile/Doctor/${userUID}`}
+                {/* <Link
+                  href={`/Profile/${userUID}`}
                   className="text-center font-hind  h-full w-44 flex items-center justify-center border-b-[1px] border-[#B1B1B1]"
                 >
                   My Profile
-                </Link>
+                </Link> */}
                 <Link
                   href={`https://seller-pet-care-pro.vercel.app/Login`}
                   className="text-center font-hind  h-full w-44 flex items-center justify-center border-b-[1px] border-[#B1B1B1]"
