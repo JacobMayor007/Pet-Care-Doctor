@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 
-import { useRouter } from "next/navigation";
 import { fetchMyPatient } from "../fetchData/fetchAppointment";
 import DoctorNavigation from "../DoctorNavbar/page";
 import { Dayjs } from "dayjs";
-import { isAuthenticate } from "../fetchData/fetchUserData";
 
 interface MyAppointment {
   id?: string;
