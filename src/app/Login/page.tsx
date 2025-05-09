@@ -79,6 +79,14 @@ export default function Login() {
     try {
       setLoading(true);
 
+      const userRef = collection(db, "Users");
+      const q2 = query(userRef, where("User_Email", "==", email));
+      const userSnap = await getDocs(q2);
+      if (userSnap.empty) {
+        alert("Invalid Credentials, or pending for approval");
+        return;
+      }
+
       const docRef = collection(db, "doctor");
       const q = query(docRef, where("doctor_email", "==", email));
       const docSnap = await getDocs(q);
@@ -123,6 +131,14 @@ export default function Login() {
     try {
       const result = await signInWithPopup(auth, provider);
 
+      const userRef = collection(db, "Users");
+      const q2 = query(userRef, where("User_Email", "==", result.user.email));
+      const userSnap = await getDocs(q2);
+      if (userSnap.empty) {
+        alert("Invalid Credentials, or pending for approval");
+        return;
+      }
+
       const docRef = collection(db, userType);
       const q = query(docRef, where("doctor_email", "==", result.user.email));
       const docSnap = await getDocs(q);
@@ -149,6 +165,14 @@ export default function Login() {
   const facebookAuth = async () => {
     try {
       const result = await signInWithPopup(auth, fbprovider);
+
+      const userRef = collection(db, "Users");
+      const q2 = query(userRef, where("User_Email", "==", result.user.email));
+      const userSnap = await getDocs(q2);
+      if (userSnap.empty) {
+        alert("Invalid Credentials, or pending for approval");
+        return;
+      }
 
       const docRef = collection(db, userType);
       const q = query(docRef, where("doctor_email", "==", result.user.email));

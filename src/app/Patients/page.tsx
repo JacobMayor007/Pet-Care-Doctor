@@ -36,21 +36,7 @@ interface MyAppointment {
 }
 
 export default function Patients() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [myAppointment, setMyAppointment] = useState<MyAppointment[]>([]);
-  const router = useRouter();
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      const login = await isAuthenticate();
-      if (!login) {
-        router.push("/Login"); // Redirect if not logged in
-      } else {
-        setIsLoggedIn(true); // Set state if logged in
-      }
-    };
-
-    checkAuthentication();
-  }, [router]);
 
   useEffect(() => {
     const getMyAppointments = async () => {
@@ -59,14 +45,6 @@ export default function Patients() {
     };
     getMyAppointments();
   }, []);
-
-  if (!isLoggedIn) {
-    return (
-      <div>
-        <div></div>
-      </div>
-    );
-  }
 
   return (
     <div>

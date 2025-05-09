@@ -2,8 +2,22 @@
 
 import { auth, provider } from "@/app/firebase/config";
 import { FacebookOutlined, GoogleOutlined } from "@ant-design/icons";
-import { FacebookAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
-import { doc, getFirestore, setDoc, Timestamp } from "firebase/firestore";
+import {
+  FacebookAuthProvider,
+  getAuth,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  setDoc,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 import Image from "next/image";
 import "@ant-design/v5-patch-for-react-19";
 import { useRouter } from "next/navigation";
@@ -25,7 +39,7 @@ export default function RegisterAsDoctor() {
   const [confirmShow, setConfirmShow] = useState(false);
   const [others, setOthers] = useState(false);
   const [subOthers, setSubOthers] = useState(false);
-
+  const [usingAuth, setUsingAuth] = useState(false);
   const [formData, setFormData] = useState({
     fName: "",
     lName: "",
@@ -125,12 +139,10 @@ export default function RegisterAsDoctor() {
         !formData.contact ||
         !formData.specialty ||
         !formData.subspecialty ||
-        !formData.petTypes ||
         !formData.professionalTitle ||
         !formData.clinicAddress ||
         !formData.licenseNumber ||
         !formData.universityAttended ||
-        !formData.yearsOfExperience ||
         !formData.clinicName ||
         !formData.Time_In ||
         !formData.Time_Out ||
@@ -166,6 +178,26 @@ export default function RegisterAsDoctor() {
         return;
       }
 
+      const usersQuery = query(
+        collection(db, "Users"),
+        where("User_Email", "==", formData.email)
+      );
+      const pendingQuery = query(
+        collection(db, "pending_users"),
+        where("User_Email", "==", formData.email)
+      );
+
+      const [usersSnapshot, pendingSnapshot] = await Promise.all([
+        getDocs(usersQuery),
+        getDocs(pendingQuery),
+      ]);
+
+      if (!usersSnapshot.empty || !pendingSnapshot.empty) {
+        alert("This email is already registered or pending approval");
+        setIsSubmitting(false);
+        return;
+      }
+
       // Create user with Firebase Authentication
       const res = await createUserWithEmailAndPassword(
         formData.email,
@@ -176,7 +208,7 @@ export default function RegisterAsDoctor() {
       }
 
       // Add user data to Firestore
-      const userRef = doc(db, "Users", res.user.uid);
+      const userRef = doc(db, "pending_users", res.user.uid);
       await setDoc(userRef, {
         User_Name: formData.fName + " " + formData.lName,
         User_Email: formData.email,
@@ -207,6 +239,8 @@ export default function RegisterAsDoctor() {
         termsAndConditions: checkBox,
       });
 
+      await signOut(auth);
+
       // Clear input fields
       setFormData({
         fName: "",
@@ -232,7 +266,7 @@ export default function RegisterAsDoctor() {
       });
 
       // Redirect to login page or home page
-      router.push("/Login");
+      router.push("/pending-approval");
     } catch (error) {
       console.error("Error during sign-up:", error);
     } finally {
@@ -255,14 +289,15 @@ export default function RegisterAsDoctor() {
         !formData.clinicName
       ) {
         alert("All fields are required.");
-        setIsSubmitting(false); // Re-enable the button
+        setIsSubmitting(false);
+        setUsingAuth(true);
         return;
       }
 
       const result = await signInWithPopup(auth, provider);
       console.log(result.providerId);
 
-      const userRef = doc(db, "Users", result.user.uid);
+      const userRef = doc(db, "pending_users", result.user.uid);
       await setDoc(userRef, {
         User_Name: result.user.displayName,
         User_Email: result.user.email,
@@ -272,8 +307,8 @@ export default function RegisterAsDoctor() {
 
       const doctorRef = doc(db, "doctor", result.user.uid);
       await setDoc(doctorRef, {
-        doctor_fullName: formData.fName + formData.lName,
-        doctor_email: formData.email,
+        doctor_fullName: result.user.displayName,
+        doctor_email: result.user.email,
         doctor_uid: result.user.uid,
         terms_and_conditions: checkBox,
         createdAt: Timestamp.now(),
@@ -291,11 +326,9 @@ export default function RegisterAsDoctor() {
         },
       });
 
-      if (result) {
-        router.push("/");
-      } else {
-        router.push("/Sign-Up");
-      }
+      await signOut(auth);
+
+      router.push("/pending-approval");
     } catch (error) {
       console.log(error);
     }
@@ -324,7 +357,7 @@ export default function RegisterAsDoctor() {
         getAuth(),
         new FacebookAuthProvider()
       );
-      const userRef = doc(db, "Users", result.user.uid);
+      const userRef = doc(db, "pending_users", result.user.uid);
       await setDoc(userRef, {
         User_Name: result.user.displayName,
         User_Email: result.user.email,
@@ -334,8 +367,8 @@ export default function RegisterAsDoctor() {
 
       const doctorRef = doc(db, "doctor", result.user.uid);
       await setDoc(doctorRef, {
-        doctor_fullName: formData.fName + formData.lName,
-        doctor_email: formData.email,
+        doctor_fullName: result.user.displayName,
+        doctor_email: result.user.email,
         doctor_uid: result.user.uid,
         terms_and_conditions: checkBox,
         createdAt: Timestamp.now(),
@@ -352,12 +385,10 @@ export default function RegisterAsDoctor() {
           years_of_experience: formData.yearsOfExperience,
         },
       });
-      if (result) {
-        router.push("/");
-      } else {
-        router.push("/Sign-Up");
-      }
-      console.log("Facebook Sign In", result);
+
+      await signOut(auth);
+
+      router.push("/pending-approval");
     } catch (err) {
       console.log(err);
     }
@@ -366,7 +397,9 @@ export default function RegisterAsDoctor() {
   console.log(formData.petTypes);
 
   return (
-    <div className="bg-[#9FE1DB] bg-signUp h-full">
+    <div
+      className={`bg-[#9FE1DB] bg-signUp ${usingAuth ? `h-screen` : `h-full`}`}
+    >
       <div className="h-fit flex flex-row">
         <div className="w-[30%]">
           <h1 className="text-5xl font-sigmar font-normal text-white mt-10 text-center">
@@ -380,7 +413,11 @@ export default function RegisterAsDoctor() {
             className="object-contain mt-8"
           />
         </div>
-        <div className="w-[70%] rounded-[25px_0px_0px_25px] z-[2] bg-white flex flex-col px-20 gap-7 h-fit">
+        <div
+          className={`w-[70%] rounded-[25px_0px_0px_25px] z-[2] bg-white flex flex-col px-20 gap-7 ${
+            usingAuth ? `h-screen` : `h-fit`
+          }`}
+        >
           <div className="mt-5 flex flex-row items-center justify-between gap-2">
             <div className="flex flex-row items-center gap-2">
               <Image
@@ -405,7 +442,7 @@ export default function RegisterAsDoctor() {
             }}
           >
             <div className="grid grid-cols-7 gap-5">
-              <div className="relative col-span-3">
+              <div className={usingAuth ? `hidden` : `relative col-span-3`}>
                 <label
                   className="absolute left-7 -top-3 bg-white text-sm font-hind w-fit text-nowrap"
                   htmlFor="fName"
@@ -426,7 +463,7 @@ export default function RegisterAsDoctor() {
                   }
                 />
               </div>
-              <div className="relative  col-span-3">
+              <div className={usingAuth ? `hidden` : `relative  col-span-3`}>
                 <label
                   className="absolute left-7 -top-3  bg-white text-sm  font-hind"
                   htmlFor="lName"
@@ -510,7 +547,7 @@ export default function RegisterAsDoctor() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-5">
-              <div className="relative">
+              <div className={usingAuth ? `hidden` : `relative`}>
                 <label
                   className="absolute left-7 -top-3  bg-white text-sm  font-hind"
                   htmlFor="email-address"
@@ -565,7 +602,7 @@ export default function RegisterAsDoctor() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-5">
+            <div className={usingAuth ? `hidden` : `grid grid-cols-2 gap-5`}>
               <div className="relative">
                 <label
                   htmlFor="password"
@@ -690,8 +727,8 @@ export default function RegisterAsDoctor() {
                   className="absolute left-7 z-20 -top-3  bg-white text-sm text-nowrap font-hind"
                 >
                   Pet Types Treated:
-                  <span className="text-red-500 text-sm font-montserrat ">
-                    *
+                  <span className="text-red-500 text-xs font-montserrat ">
+                    {"("}optional{")"}
                   </span>
                 </label>
                 <Select
@@ -844,8 +881,8 @@ export default function RegisterAsDoctor() {
                   htmlFor="experience-id"
                 >
                   Years of Exp.
-                  <span className="text-red-500 text-sm font-montserrat ">
-                    *
+                  <span className="text-red-500 text-xs font-montserrat ">
+                    {"("}optional{")"}
                   </span>
                 </label>
                 <input
@@ -1037,7 +1074,7 @@ export default function RegisterAsDoctor() {
                 </span>
               </p>
             </div>
-            <div>
+            <div className={usingAuth ? `hidden` : `block`}>
               <button
                 type="submit"
                 id="signup-button"
