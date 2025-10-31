@@ -434,6 +434,25 @@ export default function PatientDetails({ params }: DetailsProps) {
       await updateDoc(docRef, {
         Appointment_Status: "Rejected",
       });
+
+      const notifRef = collection(db, "notifications");
+      const patient = pendingAppointments?.Appointment_PatientUserUID;
+      const patient_FName = pendingAppointments?.Appointment_PatientFullName;
+      await addDoc(notifRef, {
+        appointment_ID: id,
+        sender: userData[0]?.User_UID,
+        sender_FullName: userData[0]?.User_Name,
+        receiver_FullName: patient_FName,
+        receiverID: patient,
+        title: "Your appointment has been rejected",
+        message: "Your appointment has been rejected",
+        time: time,
+        createdAt: Timestamp.now(),
+        hide: false,
+        open: false,
+        status: "unread",
+        isApproved: false,
+      });
     }
   };
 
@@ -541,12 +560,12 @@ export default function PatientDetails({ params }: DetailsProps) {
               onCancel={() => setAccept(false)}
               centered={true}
               onClose={() => setAccept(false)}
-              onOk={() => {
+              onOk={async () => {
                 if (!time) {
                   alert("Input Time");
                   return;
                 }
-                notifyDate();
+                await notifyDate();
                 setAccept(false);
                 Appointment.postApprovedAppointment(id || "", time);
                 window.location.reload();
@@ -603,9 +622,9 @@ export default function PatientDetails({ params }: DetailsProps) {
               open={changeDate}
               onCancel={() => setChangeDate(false)}
               onClose={() => setChangeDate(false)}
-              onOk={() => {
-                // notifyDate();
-                changeDateHandle();
+              onOk={async () => {
+                await changeDateHandle();
+                await notifyDate();
                 setChangeDate(false);
               }}
               centered

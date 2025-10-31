@@ -217,6 +217,8 @@ export default function RegisterAsDoctor() {
         CreatedAt: Timestamp.now(),
       });
 
+      
+
       const doctorRef = doc(db, "doctor", res.user.uid);
       await setDoc(doctorRef, {
         createdAt: Timestamp.now(),
