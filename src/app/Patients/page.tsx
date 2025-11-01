@@ -54,12 +54,6 @@ export default function Patients() {
           My Patients
         </h1>
         <div className="flex flex-col gap-4">
-          <input
-            type="text"
-            name="search-bar"
-            id="searchBar"
-            className="h-12 rounded-xl w-[659px] bg-[#EAEBEC] px-4 font-montserrat outline-none"
-          />
           <div className="w-full grid grid-cols-4 gap-4">
             {myAppointment.map((data) => {
               return (

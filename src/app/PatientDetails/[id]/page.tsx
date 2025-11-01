@@ -1367,8 +1367,8 @@ export default function PatientDetails({ params }: DetailsProps) {
                       </button>
                       <button
                         className="h-10 w-28 rounded-md bg-[#006B95] text-white font-hind"
-                        onClick={() => {
-                          submitAppointmentHistory();
+                        onClick={async () => {
+                          await submitAppointmentHistory();
                           setAddHistory(false);
                           window.location.reload();
                         }}
