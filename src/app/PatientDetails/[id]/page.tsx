@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { DatePicker, Modal, TimePicker } from "antd";
+import { DatePicker, Modal, Rate, TimePicker } from "antd";
 import { useRouter } from "next/navigation";
 import DoctorNavigation from "../../DoctorNavbar/page";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -109,6 +109,7 @@ interface Appointment {
   Appointment_Status?: string;
   Appointment_TypeOfAppointment?: string;
   Appointment_Time?: string;
+  Appointment_Rate_Feedback?: { feedback?: string; rate?: number };
 }
 
 interface Observations {
@@ -477,17 +478,23 @@ export default function PatientDetails({ params }: DetailsProps) {
         <DoctorNavigation />
       </div>
       <div className="z-10 grid grid-cols-12 mx-52 my-12 h-full">
-        <div className="col-span-12 flex flex-row gap-4 items-center">
-          <FontAwesomeIcon
-            icon={faArrowLeft}
-            className="text-3xl cursor-pointer"
-            onClick={() => {
-              history.back();
-            }}
+        <div className="col-span-12 flex flex-row gap-4 items-center justify-between">
+          <div className="flex flex-row items-center gap-4">
+            <FontAwesomeIcon
+              icon={faArrowLeft}
+              className="text-3xl cursor-pointer"
+              onClick={() => {
+                history.back();
+              }}
+            />
+            <h1 className="font-montserrat text-[#393939] font-bold text-4xl ">
+              Patient Details
+            </h1>
+          </div>
+          <Rate
+            disabled
+            value={pendingAppointments?.Appointment_Rate_Feedback?.rate}
           />
-          <h1 className="font-montserrat text-[#393939] font-bold text-4xl ">
-            Patient Details
-          </h1>
         </div>
         <div className="h-fit mt-8 col-span-4">
           <div className="flex flex-col gap-6">
